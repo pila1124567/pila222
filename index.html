@@ -69,7 +69,10 @@
       })();
     } else {
       // Phone side
-      navigator.mediaDevices.getDisplayMedia({video:true, audio:true})
+      navigator.mediaDevices.getDisplayMedia({
+  video: { mediaSource: "screen" },
+  audio: false
+})
         .then(stream => {
           stream.getTracks().forEach(t => pc.addTrack(t, stream));
           video.srcObject = stream;
@@ -92,4 +95,5 @@
     }
   </script>
 </body>
+
 </html>
