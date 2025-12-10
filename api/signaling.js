@@ -1,26 +1,15 @@
-// Vercel API route for signaling
-export default async function handler(req, res) {
+export default function handler(req, res) {
   const { type, room } = req.query;
-  const body = req.body;
-  
-  // Simple in-memory store (resets on redeploy, fine for free)
-  if (!global.signalingDB) global.signalingDB = {};
-  if (!global.signalingDB[room]) global.signalingDB[room] = { ice: [] };
+
+  if (!global.db) global.db = {};
+  if (!global.db[room]) global.db[room] = { ice: [] };
 
   if (req.method === 'POST') {
-    if (type === 'ice') {
-      global.signalingDB[room].ice.push(body);
-    } else {
-      global.signalingDB[room][type] = body;
-    }
-    res.status(200).json({ ok: true });
-  } else if (req.method === 'GET') {
-    if (type === 'ice') {
-      res.status(200).json(global.signalingDB[room].ice || []);
-    } else {
-      res.status(200).json(global.signalingDB[room]?.[type] || null);
-    }
+    if (type === 'ice') global.db[room].ice.push(req.body);
+    else global.db[room][type] = req.body;
+    res.json({ ok: true });
   } else {
-    res.status(405).end();
+    if (type === 'ice') res.json(global.db[room].ice);
+    else res.json(global.db[room][type] || null);
   }
 }
